@@ -2092,7 +2092,7 @@
   </audio>
 
   <!-- Lagu 2: Taylor Swift Study Playlist Lofi (Seamless Loop) -->
-  <audio id="audio-taylor" src="musik/01-taylor-swift-lofi.mp3" preload="none" playsinline></audio>
+  <audio id="audio-taylor" src="01-taylor-swift-lofi.mp3" preload="none" playsinline></audio>
 
   <!-- Lagu 1: Mr. Capy Study Lofi (Seamless Loop) -->
   <audio id="lofi-audio" preload="auto" playsinline>
@@ -3144,8 +3144,8 @@
     lofiAudio.volume = 0.55;
     audioTaylor.volume = 0.55;
 
-    const PLAYLIST_SRCS = [null, "musik/01-taylor-swift-lofi.mp3", "musik/02-mala-slowed.mp3", "musik/03-angel-baby.mp3", "musik/04-ariana-bye-remix.mp3", "musik/05-ayo-girl-love-me-back.mp3", "musik/06-shape-of-my-heart.mp3", "musik/07-caribbean-golden-lovestory.mp3", "musik/08-enhypen-taylor-mashup.mp3", "musik/09-alan-walker-10-lagu.mp3", "musik/10-golden-brown.mp3", "musik/11-justin-bieber-overboard.mp3", "musik/12-ayo-girl.mp3", "musik/13-turan-slowed.mp3", "musik/14-the-weeknd-sao-paulo.mp3", "musik/15-wyw-my-sweetie.mp3", "musik/16-harleys-in-hawaii.mp3", "musik/17-bad-boy-marwa-loud.mp3", "musik/18-bye-x-circus.mp3", "musik/19-stereo-love.mp3", "musik/20-alximo-paparazzi.mp3"];
-    let currentExternalSrc = 'musik/01-taylor-swift-lofi.mp3';
+    const PLAYLIST_SRCS = [null, "01-taylor-swift-lofi.mp3", "02-mala-slowed.mp3", "03-angel-baby.mp3", "04-ariana-bye-remix.mp3", "05-ayo-girl-love-me-back.mp3", "06-shape-of-my-heart.mp3", "07-caribbean-golden-lovestory.mp3", "08-enhypen-taylor-mashup.mp3", "09-alan-walker-10-lagu.mp3", "10-golden-brown.mp3", "11-justin-bieber-overboard.mp3", "12-ayo-girl.mp3", "13-turan-slowed.mp3", "14-the-weeknd-sao-paulo.mp3", "15-wyw-my-sweetie.mp3", "16-harleys-in-hawaii.mp3", "17-bad-boy-marwa-loud.mp3", "18-bye-x-circus.mp3", "19-stereo-love.mp3", "20-alximo-paparazzi.mp3"];
+    let currentExternalSrc = '01-taylor-swift-lofi.mp3';
 
     function getActiveAudio() {
       if (state.musicTrack === 0) return lofiAudio;
@@ -3259,6 +3259,19 @@
 
     lofiAudio.addEventListener('ended', playNextMusicTrack);
     audioTaylor.addEventListener('ended', playNextMusicTrack);
+
+    // Smart fallback: jika file tidak ada di root (misal saat tes lokal), coba folder musik/
+    audioTaylor.addEventListener('error', () => {
+      if (state.musicTrack > 0 && currentExternalSrc && !currentExternalSrc.startsWith('musik/')) {
+        const fallbackSrc = 'musik/' + currentExternalSrc;
+        currentExternalSrc = fallbackSrc;
+        audioTaylor.src = fallbackSrc;
+        audioTaylor.load();
+        if (state.timerRunning && state.musicEnabled && state.soundEnabled) {
+          audioTaylor.play().catch(() => {});
+        }
+      }
+    });
 
     // Toggle dropdown when clicking music icon in navbar
     btnMusicToggle.addEventListener('click', (e) => {
